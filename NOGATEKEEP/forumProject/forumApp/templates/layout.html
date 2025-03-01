@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 56px;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .navbar-brand, .nav-link {
+            color: #fff;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .btn-purple {
+            background-color: purple !important;
+            border-color: purple !important;
+            color: white; /* Optional: to ensure text is visible */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white border-bottom shadow-sm">
+
+        <a href="{% url 'home' %}" class="navbar-brand">
+            opengate
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto"> 
+                <li class="nav-item">
+                    <a href="{% url 'create_post' %}" class="nav-link">Create</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'post_list' %}" class="nav-link">View</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <li class="nav-item">
+                            <button type="submit" class="nav-link btn btn-link" style="border: none; background: none; color: grey;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="miter" class="ml-1">
+                                    <polyline points="14 7 14 2 2 2 2 22 14 22 14 17"></polyline>
+                                    <line x1="10" y1="12" x2="22" y2="12"></line>
+                                    <polyline points="18 8 22 12 18 16"></polyline>
+                                </svg>
+                                Logout
+                            </button>
+                        </li>
+                    </form>
+                {% else %}
+                    {% if request.resolver_match.url_name != 'login' %}
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="nav-link">Login/Register</a>
+                    </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+        </div>
+        
+    </nav>
+    <div class="container">
+        {% block content %}
+        
+        {% endblock content %}
+
+    
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

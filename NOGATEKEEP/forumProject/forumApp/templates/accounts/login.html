@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% comment "" %}Style for error message to be in red color {% endcomment %}
+    <style>
+        .error {
+            color: red;
+        }
+        .hyperlink {
+            color: purple;
+        }
+        .form-control {
+            width: 600px;
+            margin: 0 auto;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="jumbotron text-center">
+        
+        <h2 class="display-4">Login</h2>
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            
+            <input type="hidden" name="next" value="{{next}}">
+            <div class="form-group">
+                <label for="username"><b>Username</b></label>
+                <input type="text" class="form-control" name="username" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password"><b>Password</b></label>
+                <input type="password" class="form-control" autocomplete="off" name="password" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-purple" style="width: 600px;">Login</button>
+        </form>
+        {% comment "" %} Checking for any error messages{% endcomment %}
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <div style="padding-top: 25px;">
+        Don't have an account? <a href="{% url 'register' %}" class="hyperlink">Register</a>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock  %}
