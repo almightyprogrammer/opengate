@@ -1,0 +1,114 @@
+/* Round the corners of the carousel */
+.carousel {
+    border-radius: 15px; /* Adjust the value as needed */
+    overflow: hidden; /* Prevents images from overflowing the rounded corners */
+}
+
+.carousel-item img {
+    border-radius: 15px; /* Rounds the images inside the carousel */
+}
+
+.error {
+    color: red;
+}
+.hyperlink {
+    color: purple;
+}
+.form-control {
+    width: 600px;
+    margin: 0 auto;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 600px;
+    margin: 0 auto;
+}
+.form-group label {
+    width: 100%;
+    text-align: left;
+}
+.btn-purple {
+    margin-top: 15px;
+}
+.container {
+    margin: 0 auto; /* Centers the content */
+    padding: 20px;
+    word-wrap: break-word; /* Ensures words wrap properly */
+    overflow-wrap: break-word; /* Alternative for wrapping */
+}
+
+.post-preview {
+    display: block;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    transition: background-color 0.2s ease-in-out;
+    color: inherit;
+}
+
+.post-preview:hover {
+    background-color: #f1f1f1;
+    text-decoration: none;
+}
+
+.post-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between; /* Pushes title left & author badge right */
+    align-items: center;
+}
+
+.post-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    flex-grow: 1; /* Ensures it takes available space */
+    text-decoration: none;
+}
+
+.author-badge {
+    background-color: purple;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap; /* Prevents text wrapping */
+}
+
+.post-summary {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}
+
+.edit-badge {
+    background-color: rgb(255, 140, 0);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
+    display: inline-block; /* Ensure it is visible */
+}
+
+.cmt-badge {
+    background-color: grey !important;
+    color: white !important;
+    padding: 5px 10px !important;
+    border-radius: 5px !important;
+    font-weight: bold !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+}

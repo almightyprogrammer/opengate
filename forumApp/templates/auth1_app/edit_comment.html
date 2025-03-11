@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Comment</h1>
+    
+    <form method="POST" action="{% url 'edit_comment' post.post_id comment.id %}">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="form-group" style="margin-top: 10px; rows: 8;">
+                {{ field }}
+                {% if field.errors %}
+                    <p class="error">{{ field.errors }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+
+        <button type="submit" class="btn btn-primary btn-purple" style="width: 100%;">Save Changes</button>
+        <a href="{% url 'individual_post' post.post_id %}" class="btn btn-primary btn-warning" style="width: 100%; margin-top: 10px;">Cancel</a>
+    </form>
+    <form method="POST" action="{% url 'delete_comment' post.post_id comment.id %}" onsubmit="return confirm('Are you sure you want to delete this comment? This action cannot be undone.');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-danger" style="width: 100%; margin-top: 10px;">
+            Delete Comment
+        </button>
+    </form>
+    
+
+
+
+
+
+
+</div>
+{% endblock %}

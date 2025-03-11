@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% load static %}
+
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}" type="text/css">
+</head>
+
+<body>
+    <div class="jumbotron text-center">
+        <h2 class="display-4">Register</h2>
+        <form method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary btn-purple" style="width: 600px; margin-top: 15px;">Register</button>
+        </form>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+
+        <div>
+            <p>Already have an account? <a style="color: purple;" href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock  %}

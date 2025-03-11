@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% load static %}
+
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}" type="text/css">
+
+</head>
+<body>
+    <div class="container">
+        <h1>{{ post.title }}</h1>
+        <p><span class="author-badge">{{ post.author }}</span>
+            {% if post.author == user %}
+            <a href="{% url 'edit_post' post.post_id %}">
+            <span class="edit-badge">Edit Post</span>
+            </a>
+            {% endif %}
+        </p>
+        <p> {{ post.content }}</p>
+    </div>
+    <hr>
+    <div class="container">
+        <h2>Comments</h2>
+        <form method="POST" action="{% url 'post_detail' post.post_id %}">
+            {% csrf_token %}
+            {{comment_form.content}}
+            <button type="submit" class="btn btn-primary btn-purple" style="width:100%; margin-bottom: 15px;">Submit Comment</button>
+        </form>
+        {% for comment in comments %}
+        <div class="post-preview" >
+            <div class="post-content">
+                <div class="post-header">
+                    <span class="cmt-badge">{{ comment.user }}</span>
+                    {% if comment.user == user %}
+                    
+                    <a href="{% url 'edit_comment' post.post_id comment.id %}"><span class="edit-badge">Edit</span></a>
+                    
+                    {% endif %}
+                </div>
+                <p class="post-summary">
+                    {{ comment.content }}
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</html>
+{% endblock  %}
