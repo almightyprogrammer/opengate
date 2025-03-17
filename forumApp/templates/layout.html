@@ -10,7 +10,7 @@
             padding-top: 56px;
         }
         .navbar {
-            background-color: #343a40;
+            background-color: #fff;
         }
         .navbar-brand, .nav-link {
             color: #fff;
@@ -26,12 +26,21 @@
             border-color: purple !important;
             color: white; /* Optional: to ensure text is visible */
         }
+        .sidebar {
+            min-height: 100vh; /* Make sidebar stretch full height */
+            background-color: #fff; /* White background */
+            border-right: 1px solid #dee2e6; /* Subtle right border */
+        }
+        .sidebar .nav-link {
+            color: #fff; /* Dark link text */
+        }
+
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white border-bottom shadow-sm">
 
-        <a href="{% url 'home' %}" class="navbar-brand">
+        <a href="{% url 'post_list' %}" class="navbar-brand" style="color: purple;">
             opengate
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,9 +51,7 @@
                 <li class="nav-item">
                     <a href="{% url 'create_post' %}" class="nav-link">Create</a>
                 </li>
-                <li class="nav-item">
-                    <a href="{% url 'post_list' %}" class="nav-link">Browse</a>
-                </li>
+
             </ul>
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
@@ -77,9 +84,6 @@
                                 Login
                             </button>
                         </form>
-                        
-                        
-                        
                     </li>
                     {% endif %}
                 {% endif %}
@@ -87,6 +91,57 @@
         </div>
         
     </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- WHITE SIDEBAR -->
+            <div class="col-md-2 sidebar p-0">
+                <nav class="navbar navbar-light flex-md-column align-items-start p-3">
+                    <span class="h5">Industry</span>
+                    <ul class="navbar-nav w-80 mt-2">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'post_list' %}">All</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Technology-IT' %}">Technology &amp; IT</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Business-Finance' %}">Business &amp; Finance</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Engineering' %}">Engineering</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Healthcare-Life Sciences' %}">Healthcare &amp; Life Sciences</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Education-Research' %}">Education &amp; Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Design' %}">Design</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Legal-Compliance' %}">Legal &amp; Compliance</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Sciences' %}">Sciences</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'industry_post_list' 'Government-Public Services' %}">Government &amp; Public Services</a>
+                        </li>
+                    </ul>
+                    <hr>
+                    {% if user.is_authenticated %}
+                        <span class="h5">{{request.user.username}}</span>
+                        <ul class="navbar-nav w-100 mt-2">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'user_post_list' %}">Your posts</a>
+                            </li>
+                            
+                        </ul>
+                    {% endif %}
+                </nav>
+            </div>
+    
     <div class="container">
         {% block content %}
         

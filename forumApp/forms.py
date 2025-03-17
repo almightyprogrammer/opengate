@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Post, Comment
+from .models import Post, Comment, CHOICES_TOPIC, CHOICES_INDUSTRY
+from django_select2.forms import Select2Widget
 
 class RegisterForm(forms.Form):
 
@@ -23,11 +24,24 @@ class RegisterForm(forms.Form):
         return cleaned_data
 
 class PostForm(forms.ModelForm):
-    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'}))
-    content = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'autocomplete': 'off'}))
+    title = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'})
+    )
+    content = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'autocomplete': 'off'})
+    )
+    topic_tag = forms.ChoiceField(
+        choices=CHOICES_TOPIC, 
+        widget=Select2Widget(attrs={'class': 'form-control'})
+    )
+    industry_tag = forms.ChoiceField(
+        choices=CHOICES_INDUSTRY, 
+        widget=Select2Widget(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'topic_tag', 'industry_tag']
 
 
 class CommentForm(forms.ModelForm):

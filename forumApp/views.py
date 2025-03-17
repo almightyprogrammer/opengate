@@ -5,28 +5,37 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.contrib.auth.models import User
-from .forms import RegisterForm, CommentForm, Comment
-from .models import Post, Comment
-from .forms import PostForm
 from django.contrib import messages
-import asyncio
-from asgiref.sync import sync_to_async
+from django.core.mail import send_mail
+from django.http import HttpResponse
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_str
+
+# Remove asyncio and sync_to_async imports since we're fully synchronous
+# import asyncio
+# from asgiref.sync import sync_to_async
+
+from .forms import RegisterForm, CommentForm
+from .models import Post, Comment, INDUSTRY_DICT
+from .forms import PostForm
+from .utils import generate_email_verification_link
 
 
-async def register_view(request):
+def register_view(request):
     error_message = ""
     form = RegisterForm()
 
     if request.method == "POST":
         form = RegisterForm(request.POST)
-
         if form.is_valid():
             email = form.cleaned_data.get("email_address")
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
 
-            email_exists = await sync_to_async(User.objects.filter(email=email).exists)()
-            username_exists = await sync_to_async(User.objects.filter(username=username).exists)()
+            # Check if email or username already exist
+            email_exists = User.objects.filter(email=email).exists()
+            username_exists = User.objects.filter(username=username).exists()
 
             if email_exists and username_exists:
                 error_message = "Email AND username already exist!"
@@ -38,55 +47,84 @@ async def register_view(request):
             if error_message:
                 return render(request, "accounts/register.html", {"form": form, "error": error_message})
 
-            user = await sync_to_async(User.objects.create_user)(username=username, password=password)
+            # Create the new user (inactive until email verification)
+            user = User.objects.create_user(username=username, password=password, email=email)
+            user.is_active = False
+            user.save()
 
-            await asyncio.sleep(3)
+            # Generate the email verification link
+            verification_link = generate_email_verification_link(user, request)
 
-            await sync_to_async(login)(request, user)
+            # Send verification email
+            send_mail(
+                "Verify your OpenGate account",
+                f"Click the link below to verify your email:\n\n{verification_link}",
+                "opengatehelp@gmail.com",  # sender
+                [email],
+                fail_silently=False,
+            )
 
-            return redirect("home")
+            messages.success(
+                request,
+                "A verification email has been sent. Please check your inbox (possibly spam)."
+            )
+            return redirect("login")
 
     return render(request, "accounts/register.html", {"form": form, "error": error_message})
 
 
-async def login_view(request):
-    
+def verify_email(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True  # Activate user
+        user.save()
+        messages.success(request, "Your email has been verified! You can now log in.")
+        return redirect("login")
+    else:
+        messages.error(request, "Invalid or expired verification link.")
+        return redirect("home")
+
+
+def login_view(request):
     error_message = ""
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = await sync_to_async(authenticate)(request, username=username, password=password)
+        username = request.POST.get("username")
+        password = request.POST.get("password")
 
+        # Authenticate user
+        user = authenticate(request, username=username, password=password)
         if user is not None:
-            await sync_to_async(login)(request, user)
-            next_url = request.POST.get('next') or request.GET.get('next') or 'home'
-            await asyncio.sleep(1)
+            # Check if user is verified
+            if not user.is_active:
+                messages.error(request, "Your account is not verified. Please check your email.")
+                return redirect("login")
+
+            # Log the user in
+            login(request, user)
+            next_url = request.POST.get("next") or request.GET.get("next") or "home"
             return redirect(next_url)
         else:
-            await asyncio.sleep(3)
             messages.error(request, "Invalid credentials!")
-            return redirect('login')
-    
-    return render(request, 'accounts/login.html', {'error': error_message})
+            return redirect("login")
+
+    return render(request, "accounts/login.html", {"error": error_message})
 
 
 def logout_view(request):
-    
     if request.method == "POST":
         logout(request)
-        return redirect('home')
-    else:
-        return redirect('home')
-    
-
-
-
-
+        return redirect("home")
+    return redirect("home")
 
 
 def home_view(request):
-    
-    return render(request, 'auth1_app/home.html')
+    posts = Post.objects.all().order_by('-created_at')
+    return render(request, 'auth1_app/view_post.html', {"posts": posts})
 
 
 @login_required
@@ -99,17 +137,17 @@ def create_post_view(request):
             post.author = request.user
             post.save()
             return redirect('post_list')
-    
-    return render(request, 'auth1_app/new_post.html', {'form':form})
+    return render(request, 'auth1_app/new_post.html', {'form': form})
 
-@login_required
+
 def post_list_view(request):
     posts = Post.objects.all().order_by('-created_at')
     return render(request, 'auth1_app/view_post.html', {"posts": posts})
 
+
 @login_required
 def post_view(request, id):
-    # Show the post and all comments
+    # Show the post and its top-level comments
     post = get_object_or_404(Post, post_id=id)
     comments = post.comments.filter(parent__isnull=True)
     form = CommentForm()
@@ -118,85 +156,107 @@ def post_view(request, id):
         'comment_form': form,
         'comments': comments,
     })
-#Protected View
+
+
+@login_required
+def specific_industry_post_list_view(request, industry):
+    posts = Post.objects.filter(industry_tag=industry)
+    industry_readable = INDUSTRY_DICT.get(industry)
+    return render(request, 'auth1_app/view_specific_post.html', {
+        'posts': posts,
+        'industry': industry,
+        'industry_readable': industry_readable,
+    })
+
+
+@login_required
+def user_post_list_view(request):
+    user = request.user
+    posts = Post.objects.filter(author=user).order_by('-created_at')
+    return render(request, 'auth1_app/view_user_post.html', {
+        'posts': posts,
+        'user': user,
+    })
+
 
 @login_required
 def edit_post_view(request, id):
     post = get_object_or_404(Post, post_id=id)
-
-    # Prevent users who are not the author from editing
-    if request.user != post.author:
+    # Only allow post author or superuser
+    if request.user != post.author and not request.user.is_superuser:
         return render(request, 'auth1_app/view_individual_post.html', {
             'post': post,
             'error': "You are not allowed to edit this post!"
         })
-    # Preload post content
-    form = PostForm(instance=post)
 
+    form = PostForm(instance=post)
     if request.method == "POST":
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
-            return redirect('individual_post', id=post.post_id)  # Redirect to the post view
+            return redirect('individual_post', id=post.post_id)
 
     return render(request, 'auth1_app/edit_post.html', {'form': form, 'post': post})
+
 
 @login_required
 def edit_comment_view(request, post_id, id):
     comment = get_object_or_404(Comment, id=id)
     post = comment.post
-    # Prevent users who are not the author from editing
-    if request.user != comment.user:
+    # Only allow comment author or superuser
+    if request.user != comment.user and not request.user.is_superuser:
         return render(request, 'auth1_app/view_individual_post.html', {
             'comment': comment,
-            'post' : post,
+            'post': post,
             'error': "You are not allowed to edit this comment!"
         })
-    # Preload comment content
-    form = CommentForm(instance=comment)
 
+    form = CommentForm(instance=comment)
     if request.method == "POST":
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
             form.save()
             return redirect('individual_post', id=post.post_id)
-        
+
     return render(request, 'auth1_app/edit_comment.html', {'form': form, 'comment': comment, 'post': post})
+
 
 @login_required
 def delete_comment_view(request, post_id, id):
     comment = get_object_or_404(Comment, id=id)
     post = comment.post
+
     if request.method == "POST":
-        if request.user != comment.user:
+        if request.user != comment.user and not request.user.is_superuser:
             return render(request, 'auth1_app/view_individual_post.html', {
                 'comment': comment,
-                'post' : post,
+                'post': post,
                 'error': "You are not allowed to delete this comment!"
             })
-        
         comment.delete()
         return redirect('individual_post', id=comment.post.post_id)
 
     return render(request, 'auth1_app/delete_comment.html', {'comment': comment, 'post': post})
+
 
 @login_required
 def delete_post_view(request, id):
     post = get_object_or_404(Post, post_id=id)
 
     if request.method == "POST":
-        if request.user != post.author:
+        if request.user != post.author and not request.user.is_superuser:
             return render(request, 'auth1_app/view_individual_post.html', {
                 'post': post,
                 'error': "You are not allowed to delete this post!"
             })
-        
         post.delete()
         return redirect('post_list')
 
     return render(request, 'auth1_app/delete_post.html', {'post': post})
 
+
 MAX_NESTING_DEPTH = 4
+
 @login_required
 def post_detail(request, post_id):
     post = Post.objects.get(post_id=post_id)
@@ -238,11 +298,8 @@ def post_detail(request, post_id):
 
 
 class ProtectedView(LoginRequiredMixin, View):
-
     login_url = '/login/'
     redirect_field_name = 'redirect_to'
 
     def get(self, request):
         return render(request, 'registration/protected.html')
-    
-

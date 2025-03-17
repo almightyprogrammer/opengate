@@ -63,8 +63,9 @@
 
 .post-header {
     display: flex;
-    justify-content: space-between; /* Pushes title left & author badge right */
     align-items: center;
+    gap: 8px; /* Adds spacing between all child elements */
+    flex-wrap: wrap; /* Prevents overflow on smaller screens */
 }
 
 .post-title {
@@ -111,4 +112,44 @@
     font-size: 12px !important;
     white-space: nowrap !important;
     display: inline-block !important;
+}
+
+.whitespace-preserve {
+    white-space: pre-wrap;
+}
+
+.industry-badge {
+    background-color: green;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
+    display: inline-block; /* Ensure it is visible */
+}
+
+.admin-badge {
+    background-color: blue;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap; /* Prevents text wrapping */
+}
+
+
+.post-badges {
+    display: flex;
+    align-items: center;
+    gap: 3px; /* Adds spacing between all child elements */
+    flex-wrap: wrap; /* Prevents overflow on smaller screens */
+}
+
+.comment-badges {
+    display: flex;
+    align-items: center;
+    gap: 3px; /* Adds spacing between all child elements */
+    flex-wrap: wrap; /* Prevents overflow on smaller screens */
 }

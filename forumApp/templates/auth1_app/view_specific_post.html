@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-
+{% load custom_filters %}
 {% load static %}
 
 
@@ -18,14 +18,14 @@
 <body>
     
     <div class="container">
-        <h1>All posts</h1>
+        <h1>All posts in {{industry_readable}} </h1>
         {% for post in posts %}
             <a href="{% url 'individual_post' id=post.post_id %}" class="post-preview">
                 <div class="post-content">
                     <div class="post-header">
                         <h2 class="post-title">{{ post.title }}</h2>
                         <span class="industry-badge">{{ post.topic_tag }}</span>
-                        <span class="industry-badge">{{ post.industry_tag }}</span>
+                        <span class="industry-badge">{{industry_readable}}</span>
                         <span class="author-badge">{{ post.author }}</span>
                     </div>
                     <p class="post-summary">
@@ -35,7 +35,6 @@
             </a>
         {% endfor %}
     </div>
-    
     
 </body>
 </html>

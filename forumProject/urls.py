@@ -25,4 +25,5 @@ urlpatterns = [
     path('accounts/register/', views.register_view, name="register"),
     path('auth1_app/new_post/', views.create_post_view, name="create_post"),
     path('auth1_app/view_posts/', views.post_list_view, name="post_list"),
+    path('select2/', include('django_select2.urls')),
 ]

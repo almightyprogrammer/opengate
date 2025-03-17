@@ -16,14 +16,20 @@
 <body>
     <div class="container">
         <h1>{{ post.title }}</h1>
-        <p><span class="author-badge">{{ post.author }}</span>
-            {% if post.author == user %}
-            <a href="{% url 'edit_post' post.post_id %}">
-            <span class="edit-badge">Edit Post</span>
-            </a>
+        <div class="post-badges">
+            {% if post.author.is_superuser %}
+                <span class="admin-badge">Admin</span>
             {% endif %}
-        </p>
-        <p> {{ post.content }}</p>
+            <span class="author-badge">{{ post.author }}</span>
+        
+            {% if post.author == user or request.user.is_superuser %}
+                <a href="{% url 'edit_post' post.post_id %}">
+                    <span class="edit-badge">Edit Post</span>
+                </a>
+            {% endif %}
+        </div>
+        
+        <p>{{ post.content|linebreaksbr }}</p>
     </div>
     <hr>
     <div class="container">
@@ -37,15 +43,20 @@
         <div class="post-preview" >
             <div class="post-content">
                 <div class="post-header">
+                    <div class="comment-badges">
+                    {% if user.is_superuser %}
+                    <span class="admin-badge">Admin</span>
+                    {% endif %}
                     <span class="cmt-badge">{{ comment.user }}</span>
-                    {% if comment.user == user %}
+                    {% if comment.user == user or request.user.is_superuser %}
                     
                     <a href="{% url 'edit_comment' post.post_id comment.id %}"><span class="edit-badge">Edit</span></a>
                     
                     {% endif %}
+                    </div>
                 </div>
                 <p class="post-summary">
-                    {{ comment.content }}
+                    {{ comment.content|linebreaksbr }}
                 </p>
             </div>
         </div>

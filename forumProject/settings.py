@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_select2',
     'forumApp',
 ]
 
@@ -51,12 +52,24 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+#Email Verification Settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True  # Secure connection
+EMAIL_HOST_USER = 'opengatehelp@gmail.com'  # Replace with your Gmail
+EMAIL_HOST_PASSWORD = 'wmab tteq igtj zadf'  # Use App Password, NOT your Google password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
 ROOT_URLCONF = 'forumProject.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'forumApp' / 'templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
