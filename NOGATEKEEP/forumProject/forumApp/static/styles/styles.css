@@ -1,9 +1,0 @@
-/* Round the corners of the carousel */
-.carousel {
-    border-radius: 15px; /* Adjust the value as needed */
-    overflow: hidden; /* Prevents images from overflowing the rounded corners */
-}
-
-.carousel-item img {
-    border-radius: 15px; /* Rounds the images inside the carousel */
-}
