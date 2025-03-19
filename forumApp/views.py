@@ -12,9 +12,6 @@ from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_str
 
-# Remove asyncio and sync_to_async imports since we're fully synchronous
-# import asyncio
-# from asgiref.sync import sync_to_async
 
 from .forms import RegisterForm, CommentForm
 from .models import Post, Comment, INDUSTRY_DICT

@@ -12,19 +12,22 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+import psycopg2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--$h#!7-f)=z@oyuap-o@t)su5^%ov9tae%)t7ifrwlmb!69^*7'
+# SECURITY WARNING: keep the secret key used in production secret
+SECRET_KEY = SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_select2',
     'forumApp',
+
 ]
 
 MIDDLEWARE = [
@@ -57,8 +61,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True  # Secure connection
-EMAIL_HOST_USER = 'opengatehelp@gmail.com'  # Replace with your Gmail
-EMAIL_HOST_PASSWORD = 'wmab tteq igtj zadf'  # Use App Password, NOT your Google password
+EMAIL_HOST_USER = "opengatehelp@gmail.com"
+EMAIL_HOST_PASSWORD = "wmab tteq igtj zadf"  # Use App Password, NOT your Google password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
@@ -88,10 +92,28 @@ WSGI_APPLICATION = 'forumProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+'''DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}'''
+
+DATABASES = {
+    'default' : {
+
+        'ENGINE' : 'django.db.backends.postgresql',
+
+        'NAME' : 'db1',
+
+        'USER' : 'humble_farmer',
+
+        'PASSWORD' : 'Juwonh0308!',
+
+        'HOST' : 'opengate-db-1.czaik0mginn5.ap-southeast-2.rds.amazonaws.com',
+
+        'PORT' : '5432',
+
     }
 }
 
